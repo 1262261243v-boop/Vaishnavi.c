@@ -1,48 +1,65 @@
 #include <stdio.h>
-#include <stdlib.h>
+
+struct Robot {
+    float angle, temperature, torque;
+    int status;
+};
 
 int main() {
-    FILE *sourceFile, *destFile;
-    char sourcePath[256], destPath[256];
-    int ch;
+    struct Robot r;
+    FILE *fp;
+    int n, i;
 
-    printf("Enter source file name: ");
-    if (scanf("%255s", sourcePath) != 1) {
-        printf("Invalid source file name.\n");
-        return 1;
+    fp = fopen("robot.txt", "a");
+
+    printf("Enter number of records: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("\nEnter joint angle: ");
+        scanf("%f", &r.angle);
+
+        printf("Enter motor temperature: ");
+        scanf("%f", &r.temperature);
+
+        printf("Enter torque value: ");
+        scanf("%f", &r.torque);
+
+        printf("Enter status (1=ON, 0=OFF): ");
+        scanf("%d", &r.status);
+
+        fprintf(fp, "%.2f %.2f %.2f %d\n",
+                r.angle, r.temperature,
+                r.torque, r.status);
     }
 
-    printf("Enter destination file name: ");
-    if (scanf("%255s", destPath) != 1) {
-        printf("Invalid destination file name.\n");
-        return 1;
+    fclose(fp);
+
+    fp = fopen("robot.txt", "r");
+
+    printf("\n--- Robot Historical Records ---\n");
+
+    while(fscanf(fp, "%f %f %f %d",
+                 &r.angle, &r.temperature,
+                 &r.torque, &r.status) == 4) {
+
+        printf("\nAngle: %.2f", r.angle);
+        printf("\nTemperature: %.2f", r.temperature);
+        printf("\nTorque: %.2f", r.torque);
+
+        if(r.temperature > 80 || r.torque > 100)
+            printf("\nWARNING: Abnormal Condition!");
+        else
+            printf("\nStatus: Normal");
+
+        if(r.status == 0)
+            printf("\nMotor is OFF");
+
+        printf("\n");
     }
 
-    // Open source file in read mode ("r")
-    sourceFile = fopen(sourcePath, "r");
-    if (sourceFile == NULL) {
-        perror("Error opening source file");
-        return 1;
-    }
-
-    // Open destination file in write mode ("w") — creates if absent, overwrites if present
-    destFile = fopen(destPath, "w");
-    if (destFile == NULL) {
-        perror("Error opening destination file");
-        fclose(sourceFile);
-        return 1;
-    }
-
-    // Read character by character until EOF and write to destination file
-    while ((ch = fgetc(sourceFile)) != EOF) {
-        fputc(ch, destFile);
-    }
-
-    printf("File copied successfully from '%s' to '%s'.\n", sourcePath, destPath);
-
-    // Close both file streams
-    fclose(sourceFile);
-    fclose(destFile);
+    fclose(fp);
 
     return 0;
 }
+
