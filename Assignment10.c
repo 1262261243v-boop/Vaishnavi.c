@@ -1,64 +1,65 @@
 #include <stdio.h>
 
-struct Robot {
-    float angle, temperature, torque;
-    int status;
-};
+
+int isLeapYear(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+
+int getStartDayOfYear(int year) {
+    int y = year - 1;
+    return (year + y / 4 - y / 100 + y / 400) % 7;
+}
 
 int main() {
-    struct Robot r;
-    FILE *fp;
-    int n, i;
+    int year;
+    const char *months[12] = {
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    };
+    int daysInMonth[12] = {
+        31, 28, 31, 30, 31, 30,
+        31, 31, 30, 31, 30, 31
+    };
 
-    fp = fopen("robot.txt", "a");
-
-    printf("Enter number of records: ");
-    scanf("%d", &n);
-
-    for(i = 0; i < n; i++) {
-        printf("\nEnter joint angle: ");
-        scanf("%f", &r.angle);
-
-        printf("Enter motor temperature: ");
-        scanf("%f", &r.temperature);
-
-        printf("Enter torque value: ");
-        scanf("%f", &r.torque);
-
-        printf("Enter status (1=ON, 0=OFF): ");
-        scanf("%d", &r.status);
-
-        fprintf(fp, "%.2f %.2f %.2f %d\n",
-                r.angle, r.temperature,
-                r.torque, r.status);
+    printf("Enter year: ");
+    if (scanf("%d", &year) != 1 || year < 1) {
+        printf("Please enter a valid positive year.\n");
+        return 1;
     }
 
-    fclose(fp);
-
-    fp = fopen("robot.txt", "r");
-
-    printf("\n--- Robot Historical Records ---\n");
-
-    while(fscanf(fp, "%f %f %f %d",
-          &r.angle, &r.temperature,
-          &r.torque, &r.status) == 4) {
-
-        printf("\nAngle: %.2f", r.angle);
-        printf("\nTemperature: %.2f", r.temperature);
-        printf("\nTorque: %.2f", r.torque);
-
-        if(r.temperature > 80 || r.torque > 100)
-            printf("\nWARNING: Abnormal Condition!");
-        else
-            printf("\nStatus: Normal");
-
-        if(r.status == 0)
-            printf("\nMotor is OFF");
-
-        printf("\n");
+   
+    if (isLeapYear(year)) {
+        daysInMonth[1] = 29;
     }
 
-    fclose(fp);
+    int currentDay = getStartDayOfYear(year);
+
+    for (int m = 0; m < 12; m++) {
+        printf("\n------------ %s %d ------------\n", months[m], year);
+        printf("Sun  Mon  Tue  Wed  Thu  Fri  Sat\n");
+
+     
+        for (int space = 0; space < currentDay; space++) {
+            printf("     ");
+        }
+
+        
+        for (int day = 1; day <= daysInMonth[m]; day++) {
+            printf("%3d  ", day);
+            currentDay = (currentDay + 1) % 7;
+
+            if (currentDay == 0) {
+                printf("\n");
+            }
+        }
+
+        
+        if (currentDay != 0) {
+            printf("\n");
+        }
+    }
 
     return 0;
 }
