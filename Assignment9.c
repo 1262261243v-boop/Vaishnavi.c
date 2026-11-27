@@ -1,46 +1,29 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-int main() {
-    FILE *sourceFile, *destFile;
-    char sourcePath[100], destPath[100];
-    int ch;
+int main()
+{
+    FILE *f1, *f2;
+    char ch;
 
-    
-    printf("Enter source file path: ");
-    scanf("%99s", sourcePath);
+    f1 = fopen("source.txt", "r");
+    f2 = fopen("destination.txt", "w");
 
-    printf("Enter destination file path: ");
-    scanf("%99s", destPath);
-
-    
-    sourceFile = fopen(sourcePath, "r");
-    if (sourceFile == NULL) {
-        perror("Error opening source file");
+    if(f1 == NULL || f2 == NULL)
+    {
+        printf("File opening error");
         return 1;
     }
 
-    
-    destFile = fopen(destPath, "w");
-    if (destFile == NULL) {
-        perror("Error opening destination file");
-        fclose(sourceFile); // Close source file before exiting
-        return 1;
+    while((ch = fgetc(f1)) != EOF)
+    {
+        fputc(ch, f2);
     }
 
-    
-    while ((ch = fgetc(sourceFile)) != EOF) {
-        fputc(ch, destFile);
-    }
+    printf("File copied successfully!");
 
-    printf("File copied successfully.\n");
-
-   
-    fclose(sourceFile);
-    fclose(destFile);
+    fclose(f1);
+    fclose(f2);
 
     return 0;
-}
-
-      
+}     
     
